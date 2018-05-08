@@ -17,6 +17,9 @@ var ix;
 
 $(document).ready(function() {
 
+	//change data-ix to prevent overlap with webflow js
+	$("a[data-ix='cardflip']").attr("data-ix", "cardflop");
+
 	//set the game mode when 1-4 click
 	$("[data-w-id=\"42908028-b80c-b3cc-2f08-aec8b38bc4d6\"]").click(function() {
 		setGameMode(true);
@@ -46,6 +49,7 @@ $(document).ready(function() {
 
 function initAnimations() {
 	ix = Webflow.require('ix');
+	ix.destroy();
 }
 
 function setGameMode(isOneToFourGrade) {
