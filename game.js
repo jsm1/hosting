@@ -401,7 +401,15 @@ function getFilenameFromUrl(url) {
 		return;
 	}
 
-	var regex = new RegExp(".*\/_*([^\/]+)$");
+	//if absolute url
+	var absoluteUrlRegex = new RegExp("webflow", "i");
+	var regex;
+	if (absoluteUrlRegex.test(url)) {
+		regex = new RegExp(".*\/[^_]+_*([^\/]+)$");
+	} else {
+		regex = new RegExp(".*\/([^\/]+)$");
+	}
+
 	var filename = url.replace(regex, "$1");
 	console.log("FILENAME IS " + filename);
 	return filename;
