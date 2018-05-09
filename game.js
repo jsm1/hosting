@@ -401,7 +401,7 @@ function getFilenameFromUrl(url) {
 		return;
 	}
 
-	var regex = new RegExp(".*(\/|_)([^\/]+)$");
+	var regex = new RegExp(".*\/_*([^\/]+)$");
 	var filename = url.replace(regex, "$1");
 	console.log("FILENAME IS " + filename);
 	return filename;
