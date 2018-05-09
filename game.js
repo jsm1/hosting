@@ -401,7 +401,7 @@ function getFilenameFromUrl(url) {
 		return;
 	}
 
-
+	var fileUrl = url;
 	//if absolute url
 	var absoluteUrlRegex = new RegExp("webflow", "i");
 	var regex;
@@ -409,12 +409,14 @@ function getFilenameFromUrl(url) {
 		regex = new RegExp(".*\/[^_]+_*([^\/]+)$");
 
 		//replace %20s with hyphens
-		url = url.replace(/%20/g, "-");
+		fileUrl = fileUrl.replace(/%20/g, "-");
 	} else {
 		regex = new RegExp(".*\/([^\/]+)$");
 	}
 
-	var filename = url.replace(regex, "$1");
+	var filename = fileUrl.replace(regex, "$1");
 	console.log("FILENAME IS " + filename);
 	return filename;
 }
+
+
