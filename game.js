@@ -16,12 +16,12 @@ var dragGameMatches = {
 }
 
 var dragGameMatchesImgToClass = {
-	"images/crawl.svg": "crawl",
-	"images/two-metres.svg": "fire",
-	"images/stop-drop.svg": "drop",
-	"images/000.svg": "dial",
-	"images/fireescape.svg": "plan",
-	"images/somkealarm.svg": "firealarm"
+	"crawl.svg": "crawl",
+	"two-metres.svg": "fire",
+	"stop-drop.svg": "drop",
+	"000.svg": "dial",
+	"fireescape.svg": "plan",
+	"somkealarm.svg": "firealarm"
 }
 
 var gameState = {
@@ -63,8 +63,9 @@ $(document).ready(function() {
 			//get img src for dragged text
 			var src = $(this).find("a._1-4-grade img").attr("src");
 
+			var filename = getFilenameFromUrl(src);
 			//get matching class
-			var matchingClass = dragGameMatchesImgToClass[src];
+			var matchingClass = dragGameMatchesImgToClass[filename];
 			if (!matchingClass) {
 				//if no match revert
 				return true;
@@ -392,4 +393,16 @@ function triggerTickForDropGame(droppableElement) {
               "stepsB":[]
           };
     ix.run(tickTrigger, $(droppableElement));
+}
+
+
+function getFilenameFromUrl(url) {
+	if (!url) {
+		return;
+	}
+
+	var regex = new RegExp(".*\/([^\/]+)$");
+	var filename = url.replace(regex, "$1");
+	console.log("FILENAME IS " + filename);
+	return filename;
 }
