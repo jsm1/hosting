@@ -401,11 +401,15 @@ function getFilenameFromUrl(url) {
 		return;
 	}
 
+
 	//if absolute url
 	var absoluteUrlRegex = new RegExp("webflow", "i");
 	var regex;
 	if (absoluteUrlRegex.test(url)) {
 		regex = new RegExp(".*\/[^_]+_*([^\/]+)$");
+
+		//replace %20s with hyphens
+		url = url.replace(/%20/g, "-");
 	} else {
 		regex = new RegExp(".*\/([^\/]+)$");
 	}
