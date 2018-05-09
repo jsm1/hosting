@@ -4,6 +4,26 @@ var isOneToFour = false;
 var cardTypes = ["crawl-flip", "heater-flip", "alarm-flip", "_000-flip", "plan-flip", "roll-flip"];
 var cardTypesStr = cardTypes.join(" ");
 
+
+//class name of droppable target mapped to text image sources
+var dragGameMatches = {
+	crawl: "images/crawl.svg",
+	fire: "images/two-metres.svg",
+	drop: "images/stop-drop.svg",
+	dial: "images/000.svg",
+	plan: "images/fireescape.svg",
+	firealarm: "images/smokealarm.svg"
+}
+
+var dragGameMatchesImgToClass = {
+	"images/crawl.svg": "crawl",
+	"images/two-metres.svg": "fire",
+	"images/stop-drop.svg": "drop",
+	"images/000.svg": "dial",
+	"images/fireescape.svg": "plan",
+	"images/somkealarm.svg": "firealarm"
+}
+
 var gameState = {
 	cards: [],
 	activeCard1: -1,
@@ -37,9 +57,49 @@ $(document).ready(function() {
 
 	shuffleCards();
 	initAnimations();
-	$(".draggable").draggable({revert: "invalid", stack: ".draggable"});
-	$(".droppable").droppable({accept: ".draggable", drop: function() {
-		console.log("DROPPED");
+	$(".draggable").draggable({
+		revert: function(droppable) {
+
+			//get img src for dragged text
+			var src = $(this).find("a._1-4-grade img").attr("src");
+
+			//get matching class
+			var matchingClass = dragGameMatchesImgToClass[src];
+			if (!matchingClass) {
+				//if no match revert
+				return true;
+			}
+
+			console.log($(droppable).children("div._1-4-grade").attr("class"));
+			//test if dropped on correct element
+			if ($(droppable).children("div._1-4-grade").hasClass(matchingClass)) {
+				//match found, don't revert
+				$(this).addClass("dropped");
+
+				//center if correctly dropped
+				$(this).position({
+					my: "center",
+					at: "center",
+					of: $(droppable),
+					using: function(pos) {
+						$(this).animate(pos, 200, "linear");
+					}
+   				});
+
+   				//trigger tick
+   				triggerTickForDropGame(droppable);
+				return false;
+			}
+			return true;
+
+		},
+		stack: ".draggable", 
+		snap: ".droppable"
+	});
+	$(".droppable").droppable({accept: ".draggable", drop: function(event, ui) {
+		console.log("DROPPED SUCCESFULLY");
+		
+		
 	}} );
 
 	//drag game setup
@@ -308,4 +368,28 @@ function areAllCardsUsed(cardsUsed) {
 		}
 	}
 	return true;
+}
+
+//trigger tick for drop game
+function triggerTickForDropGame(droppableElement) {
+	var tickTrigger = {
+              "type":"click",
+              "selector":".correct-image",
+              "descend":true,
+              "preserve3d":true,
+              "stepsA":[ {
+                  "wait": "600ms"
+              }
+              ,
+              {
+                  "display": "block", "opacity": 1, "transition": "opacity 200 ease 0, transform 200 ease 0", "scaleX": 1.16, "scaleY": 1.16, "scaleZ": 1
+              }
+              ,
+              {
+                  "transition": "transform 200 ease 0", "scaleX": 1, "scaleY": 1, "scaleZ": 1
+              }
+              ],
+              "stepsB":[]
+          };
+    ix.run(tickTrigger, $(droppableElement));
 }
