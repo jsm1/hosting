@@ -146,6 +146,7 @@ function setGameMode(isOneToFourGrade) {
 function wellDoneClicked() {
 	//reset droppable cards in case they have moved
 	resetDroppableCards();
+	$(".correct-image").css("display", "none");
 }
 
 function initOneToFour() {
