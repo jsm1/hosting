@@ -50,12 +50,11 @@ $(document).ready(function() {
 		setGameMode(false);
 	});
 
-	//listeners for 1-4 card flips
-	$("a._5-6-grade").click(function() {
-		cardClicked($(this));
+	//listener for welldone button
+	$("[data-w-id=\"62daae69-adf2-d76d-0fad-100828d4f0a2\"]").click(function() {
+		wellDoneClicked();
 	});
 
-	shuffleCards();
 	initAnimations();
 	$(".draggable").draggable({
 		revert: function(droppable) {
@@ -89,6 +88,10 @@ $(document).ready(function() {
 
    				//trigger tick
    				triggerTickForDropGame(droppable);
+   				var complete = isDragGameComplete();
+   				if (complete) {
+   					showComplete();
+   				}
 				return false;
 			}
 			return true;
@@ -108,6 +111,14 @@ $(document).ready(function() {
 	//$("div._1-4-grade").droppable();
 });
 
+function showComplete() {
+	$("#well-done-wrapper").slideDown();
+	$("html, body").animate({scrollTop: $("#well-done-wrapper").offset().top});
+}
+
+function hideComplete() {
+	$("#well-done-wrapper").slideUp();
+}
 function initAnimations() {
 	ix = Webflow.require('ix');
 	ix.destroy();
@@ -115,11 +126,86 @@ function initAnimations() {
 
 function setGameMode(isOneToFourGrade) {
 	isOneToFour = isOneToFourGrade;
+
+	//init 1-4 game
+	if (isOneToFour) {
+		//listeners for 1-4 card flips
+		$("a._5-6-grade").click(function() {
+			cardClicked($(this));
+		});
+
+		initOneToFour();
+	} else {
+		
+		initDragGame();
+	}
+	//init drag game
+	hideComplete();
+}
+
+function wellDoneClicked() {
+	//reset droppable cards in case they have moved
+	resetDroppableCards();
+}
+
+function initOneToFour() {
+
+	//reset game state
+	gameState = {
+		cards: [],
+		activeCard1: -1,
+		activeCard2: -1,
+		activeCardIndex1: "",
+		activeCardIndex2: "",
+		gameComplete: false
+	}
+
+
+	//shuffle cards
+	shuffleCards();
+
+	//reset droppables in case playing drag game previously
+	//resetDroppableCards();
+	//ensure all flipped down
+	$("div.card-wrapper ._5-6-flip").each(function(index) {
+		triggerCardFlipDown(index);
+	});
+
+	//disable draggable elements
+	$(".draggable").draggable("disable");
+
+	//hide ticks
+}
+
+function initDragGame() {
+	//shuffle drag cards
+	shuffleDragCards();
+	
+	//reset droppables
+	//resetDroppableCards();
+
+	//hide ticks
+
+	//enable draggable
+	$(".draggable").draggable("enable");
+}
+
+function resetDroppableCards() {
+	//reset all positions
+	$(".draggable").css("top", "").css("left", "").css("zIndex", "").removeClass("dropped");
 }
 
 function cardClicked(click) {
+
+	//if not one to four game, return
+	if (!isOneToFour) {
+		return;
+	}
+
+
 	var index = getCardIndex($(click).children("._5-6-flip"));
 	var cardName = getCardName(index);
+
 
 	if (!cardName) {
 		throw "No such card";
@@ -164,7 +250,10 @@ function cardClicked(click) {
 			if (complete) {
 				console.log("Game complete!");
 				gameState.gameComplete = true;
+				//show compelete button
+				showComplete();
 			}
+			
 		//if not a match
 		} else {
 			gameState.cards[gameState.activeCard1].faceUp = false;
@@ -198,7 +287,6 @@ function resetActiveCards() {
 
 }
 function flipDownActiveCards(card1Index, card2Index) {
-	console.log("GOT HERE");
 	triggerCardFlipDown(card1Index);
 	triggerCardFlipDown(card2Index);
 }
@@ -295,7 +383,7 @@ function triggerTick(index) {
               }
               ,
               {
-                  "opacity": 1, "transition": "opacity 200 ease 0, transform 200 ease 0", "scaleX": 1.16, "scaleY": 1.16, "scaleZ": 1
+                  "display": "block", "opacity": 1, "transition": "opacity 200 ease 0, transform 200 ease 0", "scaleX": 1.16, "scaleY": 1.16, "scaleZ": 1
               }
               ,
               {
@@ -419,4 +507,41 @@ function getFilenameFromUrl(url) {
 	return filename;
 }
 
+function shuffleDragCards() {
+	var imgSources = [];
+	$("div.draggable a._1-4-grade img").each(function(index) {
+		imgSources.push($(this).attr("src"));
+	});
+
+	shuffleArray(imgSources);
+
+	$("div.draggable a._1-4-grade img").each(function(index) {
+		$(this).attr("src", imgSources[index]);
+	});
+
+}
+
+/**
+ * Randomize array element order in-place.
+ * Using Durstenfeld shuffle algorithm.
+ */
+function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+}
+
+//check if all cards are dragged onto correct targets for drag game
+function isDragGameComplete() {
+	var gameFinished = true;
+	$("div.draggable").each(function() {
+		if (!$(this).hasClass("dropped")) {
+			gameFinished = false;
+		}
+	});
+	return gameFinished;
+}
 
