@@ -112,8 +112,10 @@ $(document).ready(function() {
 });
 
 function showComplete() {
-	$("#well-done-wrapper").slideDown();
-	$("html, body").animate({scrollTop: $("#well-done-wrapper").offset().top});
+	$("#well-done-wrapper").delay(800).slideDown(400, function() {
+		$("html, body").animate({scrollTop: $("#well-done-wrapper").offset().top});
+	});
+	
 }
 
 function hideComplete() {
