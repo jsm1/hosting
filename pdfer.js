@@ -132,7 +132,7 @@ function getFiveToSixAnswers() {
     $(this).children("div.multi-option").each(function() {
       var checked = $(this).find("input").prop("checked");
       var img = $(this).find("img[src$='Asset-25.svg']");
-      if (checked && img) {
+      if (checked && img.length) {
         console.log("Correct answer for " + index);
         answers[index] = "correct";
       } else if (!answers[index]) {
@@ -230,7 +230,9 @@ function generatePDF() {
    */
 
     //document.querySelector("#download-link").click();
+
     $("a.print-link").attr("href", stream.toBlobURL("application/pdf"));
+    $("a.print-link").attr("download", "checklist.pdf");
     $("a.print-link").show();
   });
 }
