@@ -131,7 +131,7 @@ function getFiveToSixAnswers() {
     answers[index] = "";
     $(this).children("div.multi-option").each(function() {
       var checked = $(this).find("input").prop("checked");
-      var img = $(this).find("img[src$='Asset-25.svg']");
+      var img = $(this).find("img[src$='25.svg']");
       if (checked && img.length) {
         console.log("Correct answer for " + index);
         answers[index] = "correct";
