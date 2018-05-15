@@ -169,6 +169,9 @@ function generatePDF() {
   var doc = new PDFDocument();
   var stream = doc.pipe(blobStream());
 
+  //set document title
+  doc.info["Title"] = "TFS-Checklist.pdf";
+
   var promises = [];
   for (let imgKey of Object.keys(images)) {
     promises.push(xhrRequestPromise('GET', images[imgKey].url));
@@ -230,6 +233,17 @@ function generatePDF() {
    */
 
     //document.querySelector("#download-link").click();
+
+    //populate iframe
+    var iframeId;
+    if (isOneToFourMode) {
+      iframeId = "iframe-wrapper-1-4";
+    } else {
+      iframeId = "iframe-wrapper-5-6";
+    }
+    $("#" + iframeId).html("<iframe src=\"" + stream.toBlobURL("application/pdf") + "\"></iframe>");
+
+
 
     $("a.print-link").attr("href", stream.toBlobURL("application/pdf"));
     $("a.print-link").attr("download", "checklist.pdf");
