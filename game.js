@@ -133,8 +133,7 @@ function initOneToFour() {
 		triggerCardFlipDown(index);
 	});
 
-	//disable draggable elements
-	$(".draggable").draggable("disable");
+
 
 	//hide ticks
 }
