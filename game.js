@@ -5,23 +5,19 @@ var cardTypes = ["crawl-flip", "heater-flip", "alarm-flip", "_000-flip", "plan-f
 var cardTypesStr = cardTypes.join(" ");
 
 
-//class name of droppable target mapped to text image sources
-var dragGameMatches = {
-	crawl: "images/crawl.svg",
-	fire: "images/two-metres.svg",
-	drop: "images/stop-drop.svg",
-	dial: "images/000.svg",
-	plan: "images/fireescape.svg",
-	firealarm: "images/smokealarm.svg"
-};
-
-var dragGameMatchesImgToClass = {
-	"crawl.svg": "crawl",
-	"two-metres.svg": "fire",
-	"stop-drop.svg": "drop",
-	"000.svg": "dial",
-	"fireescape.svg": "plan",
-	"somkealarm.svg": "firealarm"
+var fiveToSixMatches = {
+	"crawl-flip-text": "crawl-image",
+	"drop-roll-text": "roll-image",
+	"_2-metres-text": "metres-flip",
+	"escape-text": "plan-image",
+	"alarm-text": "alarm-image",
+	"_000-text": "_000-image",
+	"crawl-image": "crawl-flip-text",
+	"roll-image": "drop-roll-text",
+	"metres-flip": "_2-metres-text",
+	"plan-image": "escape-text",
+	"alarm-image": "alarm-text",
+	"_000-image": "_000-text"
 };
 
 var gameState = {
@@ -96,7 +92,7 @@ function setGameMode(isOneToFourGrade) {
 	} else {
 		//listeners for 5-6 card flips
 		$("a._5-6-grade-new").click(function() {
-			cardClicked($(this));
+			cardClickedFiveToSix($(this));
 		});
 		initFiveToSix();
 	}
@@ -106,7 +102,6 @@ function setGameMode(isOneToFourGrade) {
 
 function wellDoneClicked() {
 	//reset droppable cards in case they have moved
-	resetDroppableCards();
 	$(".correct-image").css("display", "none");
 }
 
@@ -126,8 +121,10 @@ function initOneToFour() {
 	//shuffle cards
 	shuffleCards();
 
-	//reset droppables in case playing drag game previously
-	//resetDroppableCards();
+	
+	//ensure all 5-6 game cards are display none and relevant ones visible
+	$("a._5-6-grade-new").css("display", "none");
+	$("a._5-6-grade").css("display", "flex");
 	//ensure all flipped down
 	$("div.card-wrapper ._5-6-flip").each(function(index) {
 		triggerCardFlipDown(index);
@@ -139,20 +136,148 @@ function initOneToFour() {
 }
 
 function initFiveToSix() {
+	
+
+	//reset game state
+	gameStateFiveToSix = {
+		cards: [],
+		activeCard1: -1,
+		activeCard2: -1,
+		activeCardIndex1: "",
+		activeCardIndex2: "",
+		gameComplete: false
+	}
+
 	//shuffle drag cards
 	shuffleFiveToSixCards();
+
+	//ensure all 1-4 cards are hidden and relevant ones visible
+	$("a._5-6-grade").css("display", "none");
+	$("a._5-6-grade-new").css("display", "flex");
+
+	//ensure all flipped down
+	$("div.card-wrapper ._5-6-flip").each(function(index) {
+		triggerCardFlipDown(index);
+	});
 	
 }
 
 function shuffleFiveToSixCards() {
 
+
+	var cardNames = [];
+
+	$("a._5-6-grade-new div._5-6-flip").each(function(index) {
+		$(this).attr("game-data-index", index);
+		var cardName = getCardNameFiveToSix($(this));
+		cardNames.push(cardName);
+	});
+
+
+	shuffleArray(cardNames);
+
+	$("a._5-6-grade-new div._5-6-flip").each(function(index) {
+		$(this).attr("class", "_5-6-flip " + cardNames[index]);
+		gameStateFiveToSix.cards.push({name: cardNames[index], matched: false, faceUp: false});
+	});
 }
+
+
 
 function cardClickedFiveToSix(click) {
 	if (isOneToFour) {
 		return;
 	}
+	var index = getCardIndex($(click).children("._5-6-flip"));
+	var cardName = getCardNameFiveToSix($(click).children("._5-6-flip"));
+	/*
+	console.log(index);
+	console.log(cardName);
+	*/
+
+	if (!cardName) {
+		throw "No such card 5-6";
+		return;
+	} else {
+		console.log(cardName);
+	}
+
+	//if game is over, do nothing
+	if (gameStateFiveToSix.gameComplete) {
+		return;
+	} 
+
+	//if clicked card is already matched, do nothing
+	if (gameStateFiveToSix.cards[index].matched) {
+		return;
+	}
+	//if no cards active
+	if (gameStateFiveToSix.activeCard1 === -1) {
+		gameStateFiveToSix.activeCard1 = index;
+		gameStateFiveToSix.cards[index].faceUp = true;
+		//!!trigger cardflip with no tick
+		triggerCardFlipUp(index);
+	//if 1 card is already face up then check for a match
+	} else if (gameStateFiveToSix.activeCard1 > -1 && gameStateFiveToSix.activeCard2 === -1) {
+		//if card is already active
+		if (gameStateFiveToSix.activeCard1 === index) {
+			return;
+		}
+
+		gameStateFiveToSix.activeCard2 = index;
+		//if match
+		if (fiveToSixMatches[gameStateFiveToSix.cards[gameStateFiveToSix.activeCard1].name] === gameStateFiveToSix.cards[gameStateFiveToSix.activeCard2].name) {
+			gameStateFiveToSix.cards[gameStateFiveToSix.activeCard1].matched = true;
+			gameStateFiveToSix.cards[gameStateFiveToSix.activeCard2].matched = true;
+			//!!trigger cardflip and ticks
+			triggerCardFlipUp(gameStateFiveToSix.activeCard2);
+			triggerTick(gameStateFiveToSix.activeCard1);
+			triggerTick(gameStateFiveToSix.activeCard2);
+			resetActiveCards();
+			var complete = isGameCompleteFiveToSix();
+			if (complete) {
+				console.log("Game complete!");
+				gameStateFiveToSix.gameComplete = true;
+				//show compelete button
+				showComplete();
+			}
+			
+		//if not a match
+		} else {
+			gameStateFiveToSix.cards[gameStateFiveToSix.activeCard1].faceUp = false;
+			gameStateFiveToSix.cards[gameStateFiveToSix.activeCard2].faceUp = false;
+
+			//!!trigger flip up then flip back
+			triggerCardFlipUp(gameStateFiveToSix.activeCard2);
+			window.setTimeout(flipDownActiveCards, 1000, gameStateFiveToSix.activeCard1, gameStateFiveToSix.activeCard2);
+			
+			window.setTimeout(resetActiveCards, 1100);
+		}
+		
+		
+	//if two cards already face up
+	} else if (gameStateFiveToSix.activeCard1 > -1 && gameStateFiveToSix.activeCard2 > -1) {
+		return;
+	}
+
+
+
 }
+
+function getCardNameFiveToSix(card) {
+	if (!card) {
+		return;
+	}
+
+	var classes = card.get(0).classList;
+	for (let className of classes) {
+		if (fiveToSixMatches.hasOwnProperty(className)) {
+			return className;
+		}
+	}
+	return;
+}
+
 function cardClicked(click) {
 
 	//if not one to four game, return
@@ -239,9 +364,24 @@ function isGameComplete() {
 	}
 	return true;
 }
+
+function isGameCompleteFiveToSix() {
+	for (let c of gameStateFiveToSix.cards) {
+		if (!c.matched) {
+			return false;
+		}
+	}
+	return true;
+}
 function resetActiveCards() {
-	gameState.activeCard1 = -1;
-	gameState.activeCard2 = -1;
+	if (isOneToFour) {
+		gameState.activeCard1 = -1;
+		gameState.activeCard2 = -1;
+	} else {
+		gameStateFiveToSix.activeCard1 = -1;
+		gameStateFiveToSix.activeCard2 = -1;
+	}
+
 
 }
 function flipDownActiveCards(card1Index, card2Index) {
@@ -250,8 +390,8 @@ function flipDownActiveCards(card1Index, card2Index) {
 }
 /* animations functions */
 function triggerCardFlipUp(index) {
-
 	var card = getCardForIndex(index);
+	
 	var trigger1 = {
               "type":"click",
               "selector":"._5-6-bg",
@@ -355,8 +495,14 @@ function triggerTick(index) {
 
 
 function getCardForIndex(index) {
- 	return $("[game-data-index='" + index + "']").parent("a");
+	if (isOneToFour) {
+		return $("[game-data-index='" + index + "']").parent("a");
+
+	} else {
+		return $("._5-6-grade-new [game-data-index='" + index + "']").parent("a");
+	}
 }
+
 
 function getCardIndex(card) {
 	var index = parseInt($(card).attr("game-data-index"));
@@ -399,7 +545,7 @@ function shuffleCards() {
 	}
 	
 
-	$("div.card-wrapper ._5-6-flip").each(function(index) {
+	$("div.card-wrapper a._5-6-grade ._5-6-flip").each(function(index) {
 		$(this).removeClass(cardTypesStr);
 		$(this).addClass(cardsInPosition[index]);
 
