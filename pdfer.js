@@ -91,15 +91,15 @@ $(document).ready(function() {
   });
 
   //listener for when to generate pdf for 1-4 mode
-  $("a[data-w-id=\"7fbbf89f-cea1-0d05-e84e-a3cbd8f2edf9\"]").click(function() {
+  $(".generate-pdf-link").click(function() {
     generatePDF();
   });
 
 
   //5-6 listener
-  $("a[data-w-id=\"6768f6cd-7143-cd60-9acb-49d75ff09bee\"]").click(function() {
+  /*$("a[data-w-id=\"6768f6cd-7143-cd60-9acb-49d75ff09bee\"]").click(function() {
     generatePDF();
-  });
+  });*/
 });
 
 function setModeOneToFour(oneToFour) {
