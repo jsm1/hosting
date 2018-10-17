@@ -129,17 +129,11 @@ function getFiveToSixAnswers() {
   var answers = [];
   $("div.multi-select-container div.auto-wrapper:not(.q2-success, .w-hidden-main)").each(function(index) {
     answers[index] = "";
-    /*var correctAnswerSelector = $(this).children("div.multi-option input:checked").parents("div.multi-option").find("img[src$='25.svg']");
-    if (correctAnswerSelector.length === 0) {
-      answers[index] = "incorrect";
-    } else {
-      answers[index] = "correct";
-    }*/
     $(this).children("div.multi-option").each(function() {
       var checked = $(this).find("input").prop("checked");
       var img = $(this).find("img[src$='25.svg']");
       if (checked && img.length) {
-        console.log("Correct answer for " + index);
+        //console.log("Correct answer for " + index);
         answers[index] = "correct";
       } else if (!answers[index]) {
         answers[index] = "incorrect";
