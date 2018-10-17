@@ -81,12 +81,12 @@ var isOneToFourMode = false;
 $(document).ready(function() {
 
   //set 1-4 mode
-  $("a[data-w-id=\"42908028-b80c-b3cc-2f08-aec8b38bc4d6\"]").click(function() {
+  $(".quiz-button-1-4").click(function() {
     setModeOneToFour(true);
   });
 
   //set 5-6 mode
-  $("a[data-w-id=\"266e5054-2754-b083-5e1b-a8a6aa680b88\"]").click(function() {
+  $(".quiz-button-5-6").click(function() {
     setModeOneToFour(false);
   });
 
