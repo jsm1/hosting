@@ -55,7 +55,7 @@ $(document).ready(function() {
 	});
 
 	//listener for welldone button
-	$("[data-w-id=\"62daae69-adf2-d76d-0fad-100828d4f0a2\"]").click(function() {
+	$(".well-done-button").click(function() {
 		wellDoneClicked();
 	});
 
