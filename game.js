@@ -45,12 +45,12 @@ $(document).ready(function() {
 	$("a[data-ix='cardflip']").attr("data-ix", "cardflop");
 
 	//set the game mode when 1-4 click
-	$("[data-w-id=\"42908028-b80c-b3cc-2f08-aec8b38bc4d6\"]").click(function() {
+	$(".button-1-4").click(function() {
 		setGameMode(true);
 	});
 
 	//set game mode when 5-6 clicked
-	$("[data-w-id=\"266e5054-2754-b083-5e1b-a8a6aa680b88\"]").click(function() {
+	$(".button-5-6").click(function() {
 		setGameMode(false);
 	});
 
