@@ -9,7 +9,7 @@ var fontSize = 13;
 
 var images = {
   sideImage: {
-    url: "https://uploads-ssl.webflow.com/5ab471eaed19a3819daa5598/5af51225992f25a6352afce0_pdf%20header%20graphic%402x.png"
+    url: "https://uploads-ssl.webflow.com/5ab471eaed19a3819daa5598/5bc57bd15141986aa2dad4d2_pdf-header-graphic.png"
   },
   header: {
     url: "https://uploads-ssl.webflow.com/5ab471eaed19a3819daa5598/5af5122013ebd65fabd6fea4_checklist-title%402x.png"
