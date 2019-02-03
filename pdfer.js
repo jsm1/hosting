@@ -100,6 +100,28 @@ $(document).ready(function() {
   /*$("a[data-w-id=\"6768f6cd-7143-cd60-9acb-49d75ff09bee\"]").click(function() {
     generatePDF();
   });*/
+
+  //listeners for last questions in quiz
+  //5-6 quiz
+  $('.quiz-two-wrapper form:first-of-type .multi-select-container .auto-wrapper:last-of-type .multi-option, .quiz-one-wrapper input[type="submit"]').click(function() {
+    generateAnswerSummary();
+  });
+
+  //listeners for 5-6 multi-option clicks - prevents bug that leaves no input checked after click
+  $('.quiz-two-wrapper .auto-wrapper .multi-option').click(function() {
+    $(this).find('input').prop('checked', true);
+  });
+
+  //listner to scroll final screen into view
+  $('.success-content .link-block').click(function() {
+    if (isOneToFourMode) {
+      //set scrollTop of overflow container
+      $('.success').scrollTop(0);
+    } else {
+      //scrollIntoView
+      $('.q2-success')[0].scrollIntoView();
+    }
+  });
 });
 
 function setModeOneToFour(oneToFour) {
@@ -142,6 +164,62 @@ function getFiveToSixAnswers() {
 
   });
   return answers;
+}
+
+
+function getFiveToSixAnswersWithAnswerText() {
+  var answers = [];
+  $("div.multi-select-container div.auto-wrapper:not(.q2-success, .w-hidden-main)").each(function(index) {
+    var selectedAnswer = $(this).find("div.multi-option input:checked");
+    var selectedAnswerText = selectedAnswer.parents(".quiz-btn").text();
+    //if wrapper has the correct tick, then answer is correct
+    var isSelectedAnswerCorrect = selectedAnswer.parents("div.multi-option").has("img[src$='25.svg']").length ? true : false;
+    answers[index] = {
+      answerText: selectedAnswerText,
+      correct: isSelectedAnswerCorrect
+    };
+  });
+  return answers;
+}
+
+function generateAnswerSummary() {
+  var filledAnswers = [];
+  if (isOneToFourMode) {
+    filledAnswers = getOneToFourAnswers();
+
+    filledAnswers.forEach(function(el, index) {
+      var summaryWrapper = $('.quiz-one-wrapper .success .summary .auto-wrapper').filter(':not(:first)').eq(index);
+      if (!summaryWrapper.length) {
+        return;
+      }
+      summaryWrapper.find('.question-wrapperr-summary:nth-child(2) .summary-answer').text(el || "no response");
+      if (el === "no" || !el) {
+        summaryWrapper.find('.question-wrapperr-summary:nth-child(2) .summary-question .summary-tick').hide();
+        summaryWrapper.find('.question-wrapperr-summary:nth-child(2) .summary-question .summary-cross').show();
+      } else {
+        summaryWrapper.find('.question-wrapperr-summary:nth-child(2) .summary-question .summary-tick').show();
+        summaryWrapper.find('.question-wrapperr-summary:nth-child(2) .summary-question .summary-cross').hide();
+      }
+    });
+
+  } else {
+    filledAnswers = getFiveToSixAnswersWithAnswerText();
+    //populate with answer text
+    filledAnswers.forEach(function(el, index) {
+      var summaryWrapper = $('.quiz-two-wrapper .success-wrapper .summary .auto-wrapper').eq(index);
+      if (!summaryWrapper.length) {
+        return;
+      }
+      summaryWrapper.find('.question-wrapperr-summary:nth-child(2) .summary-answer').text(el.answerText);
+      if (!el.correct) {
+        summaryWrapper.find('.question-wrapperr-summary:nth-child(2) .summary-question .summary-tick').hide();
+        summaryWrapper.find('.question-wrapperr-summary:nth-child(2) .summary-question .summary-cross').show();
+      } else {
+        summaryWrapper.find('.question-wrapperr-summary:nth-child(2) .summary-question .summary-tick').show();
+        summaryWrapper.find('.question-wrapperr-summary:nth-child(2) .summary-question .summary-cross').hide();
+      }
+    });
+  }
 }
 
 function xhrRequestPromise(method, url) {
@@ -249,6 +327,9 @@ function generatePDF() {
     $("a.print-link").attr("href", stream.toBlobURL("application/pdf"));
     $("a.print-link").attr("download", "checklist.pdf");
     $("a.print-link").show();
+
+    
+    
   });
 }
 
